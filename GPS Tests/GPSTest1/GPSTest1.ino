@@ -8,7 +8,7 @@ static const uint32_t GPSBaud = 9600;
 TinyGPSPlus gps;
 
 // The serial connection to the GPS device
-UART ss(4, 5, 0, 0);
+UART ss(4, 5, NC, NC);
 
 void setup(){
   Serial.begin(9600);

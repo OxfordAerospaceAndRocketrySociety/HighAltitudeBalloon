@@ -5,4 +5,5 @@
 4. Download the [TinyGPS++](https://github.com/mikalhart/TinyGPSPlus/archive/master.zip) Library.
 5. Open Sketch -> Include Library -> Add .ZIP Library and select the zip file you just downloaded.
 6. Open the library manager ```Ctrl+Shift+I``` and install ```LoRa by Sandeep Mistry```.
-7. You're done!
+7. Install ```CRC by Rob Tillaart``` in the library manager.
+8. You're done!

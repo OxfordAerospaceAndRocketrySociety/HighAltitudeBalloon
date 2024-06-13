@@ -19,7 +19,7 @@ void loop(){
   // This sketch displays information every time a new sentence is correctly encoded.
   while (ss.available() > 0){
     gps.encode(ss.read());
-    if (gps.location.isUpdated()){
+    if (gps.time.isUpdated()){
       // Latitude in degrees (double)
       Serial.print("Latitude= "); 
       Serial.print(gps.location.lat(), 6);      
@@ -61,7 +61,7 @@ void loop(){
       Serial.println(gps.altitude.meters()); 
 
       // Number of satellites in use (u32)
-      Serial.print("Number os satellites in use = "); 
+      Serial.print("Number of satellites in use = "); 
       Serial.println(gps.satellites.value()); 
 
       // Horizontal Dim. of Precision (100ths-i32)

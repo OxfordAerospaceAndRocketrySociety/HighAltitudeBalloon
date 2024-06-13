@@ -18,8 +18,8 @@ void setup(){
   ss.begin(9600);
 
   delay(3000);
-  Serial.println("Sending GPS setup command");
-  SetupGPSCommand();
+  //Serial.println("Sending GPS setup command");
+  //SetupGPSCommand();
 }
 
 void loop(){
@@ -37,8 +37,8 @@ void loop(){
       if (count == 5)
       {
         count = 0;
-        SetupGPSCommand();
-        Serial.println("GPS SETUP SENT****************************************************");
+        //SetupGPSCommand();
+        //Serial.println("GPS SETUP SENT****************************************************");
       }
   }
 }

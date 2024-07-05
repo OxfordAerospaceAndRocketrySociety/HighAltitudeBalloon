@@ -1,4 +1,5 @@
 # Setup
+## Arduino Setup
 1. Install the [arduino ide](https://www.arduino.cc/en/software), latest version (something like 2.3.x). Make sure you install any drivers when prompeted.
 2. Open the board manager using (the circuit board icon).
 3. Search for and install Arduino Mbed OS RP2040 Boards.
@@ -7,3 +8,5 @@
 6. Open the library manager ```Ctrl+Shift+I``` and install ```LoRa by Sandeep Mistry```.
 7. Install ```CRC by Rob Tillaart``` in the library manager.
 8. You're done!
+## Python Dependencies
+Please use pip to install `pyserial` and `tkintermapview`.

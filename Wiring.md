@@ -6,9 +6,9 @@ Please see https://pico.pinout.xyz/ for the physical location of pins.
 | ---| ---|
 |VCC | 3V3 Out|
 |GND | Ground|
-|SCK | SCK|
-|MISO | MISO|
-|MOSI |	MOSI|
+|SCK | SCK (GP 18)|
+|MISO | MISO (GP 16)|
+|MOSI |	MOSI (GP 19)|
 |NSS | GP 10|
 |NRESET| GP 9|
 |DIO0| GP 2|

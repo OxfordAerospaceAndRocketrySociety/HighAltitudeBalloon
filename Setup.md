@@ -10,3 +10,5 @@
 8. You're done!
 ## Python Dependencies
 Please use pip to install `pyserial` and `tkintermapview`.
+## KiCad Libraries
+Pi Pico - https://github.com/ncarandini/KiCad-RP-Pico

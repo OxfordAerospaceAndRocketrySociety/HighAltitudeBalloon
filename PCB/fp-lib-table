@@ -1,0 +1,5 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "RFM9X-Breakout")(type "KiCad")(uri "${KIPRJMOD}/RFM9X-Breakout.pretty")(options "")(descr ""))
+  (lib (name "Uputronics GPS")(type "KiCad")(uri "${KIPRJMOD}/Uputronics GPS.pretty")(options "")(descr ""))
+)

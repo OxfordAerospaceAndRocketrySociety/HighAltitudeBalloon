@@ -2,3 +2,4 @@
 /Desktop Program/__pycache__
 *.bin
 /PCB/PCB-Backups
+/PCB/PCB.kicad_sch.lck

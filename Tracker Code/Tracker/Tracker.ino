@@ -1,13 +1,14 @@
 //Oxford Aerospace and Rocketry 2024
-//A test of the GPS Module and UKHAS message creation
+#include <SPI.h>
+#include <LoRa.h>
 #include <TinyGPSPlus.h>
 #include "CRC16.h"
 #include "CRC.h"
 
 //Define device details
-String FlightName = "OXHABTEST0";
+String FlightName = "OXHABTEST1";
 String DEVICE = "Pico Tracker";
-String VERSION = "GPS Test 2";
+String VERSION = "V1.0";
 
 // The TinyGPSPlus and Checksum objects
 TinyGPSPlus gps;
@@ -15,6 +16,9 @@ CRC16 crc;
 
 //Define the GPS Pins
 UART GPSserial(4, 5, NC, NC);
+
+//LoRa Transmission freqeuncy (hz) 
+int freq = 433E6; 
 
 //Setup a message counter
 int count = 0;
@@ -26,13 +30,23 @@ char hms[18];
 char altitude[10];
 
 void setup() {
-  //Setup to work with HAB Gateway etc
+  //Setup the serial connection
   Serial.begin(57600);
   Serial.println("");
   Serial.print(DEVICE);
   Serial.print("");
   Serial.println(VERSION);
   Serial.println("");
+
+  //Initialise the GPS connection
+  GPSserial.begin(9600);
+
+  if (!LoRa.begin(freq)) {
+    Serial.println("Starting LoRa failed!");
+    while (1);
+  }
+  //Limit power to the UK regulation 10 mW
+  LoRa.setTxPower(10);
 }
 
 void loop() {
@@ -41,23 +55,32 @@ void loop() {
     gps.encode(GPSserial.read());
     //Send a new message every time the GPS time updates
     if (gps.time.isUpdated()) {
-      displayInfo();
+      sendInfo();
     }
   }
 }
 
-void displayInfo() {
+void sendInfo() {
   //Create a UKHAS Standard message (using: https://www.daveakerman.com/?p=2987)
   char s[100];
   formatTime(gps.time.hour(), gps.time.minute(), gps.time.second());
   formatAltitude(gps.altitude.meters());
-  snprintf(s, sizeof(s), "$$%s,%i,%s,%f,%f,%s", FlightName.c_str(), count, hms, gps.location.lat(), gps.location.lng(), altitude);
-  Serial.print("Message=");
-  Serial.print(s);
+
+  /**************************
+  *REMOVE +0.2 BEFORE FLIGHT*
+  ***************************/
+  
+  snprintf(s, sizeof(s), "$$%s,%i,%s,%f,%f,%s", FlightName.c_str(), count, hms, gps.location.lat()+0.2, gps.location.lng()+0.2, altitude);
+  Serial.print("Sending packet: ");
+  Serial.println(count);
+
+  LoRa.beginPacket();
+  LoRa.print(s);
 
   //Append the CRC16 Checksum to the end of the message
-  Serial.print("*");
-  Serial.println(calcCRC16((uint8_t *)s, sizeof(s)), HEX);
+  LoRa.print("*");
+  LoRa.print(calcCRC16((uint8_t *)s, sizeof(s)), HEX);
+  LoRa.endPacket();
 
   count++;
 }

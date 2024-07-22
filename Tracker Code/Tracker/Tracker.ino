@@ -20,8 +20,9 @@ UART GPSserial(4, 5, NC, NC);
 //LoRa Transmission freqeuncy (hz) 
 int freq = 433E6; 
 
-//Setup a message counter
+//Setup message counters
 int count = 0;
+int pkt_count = 0;
 
 //Setup the clock
 char hms[18];
@@ -38,11 +39,18 @@ void setup() {
   Serial.println(VERSION);
   Serial.println("");
 
+  //Setup the builtin LED
+  pinMode(LED_BUILTIN, OUTPUT);
+
   //Initialise the GPS connection
   GPSserial.begin(9600);
 
   if (!LoRa.begin(freq)) {
     Serial.println("Starting LoRa failed!");
+    //Flash error code
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(500);
+    digitalWrite(LED_BUILTIN, LOW);
     while (1);
   }
   //Limit power to the UK regulation 10 mW
@@ -66,23 +74,30 @@ void sendInfo() {
   formatTime(gps.time.hour(), gps.time.minute(), gps.time.second());
   formatAltitude(gps.altitude.meters());
 
-  /**************************
-  *REMOVE +0.2 BEFORE FLIGHT*
-  ***************************/
-  
-  snprintf(s, sizeof(s), "$$%s,%i,%s,%f,%f,%s", FlightName.c_str(), count, hms, gps.location.lat()+0.2, gps.location.lng()+0.2, altitude);
+  snprintf(s, sizeof(s), "$$%s,%i,%s,%f,%f,%s", FlightName.c_str(), count, hms, gps.location.lat(), gps.location.lng(), altitude);
   Serial.print("Sending packet: ");
-  Serial.println(count);
+  Serial.println(pkt_count);
 
-  LoRa.beginPacket();
-  LoRa.print(s);
+  if (gps.location.lat() != 0.0) {
+    digitalWrite(LED_BUILTIN, LOW);
+    LoRa.beginPacket();
+    LoRa.print(s);
 
-  //Append the CRC16 Checksum to the end of the message
-  LoRa.print("*");
-  LoRa.print(calcCRC16((uint8_t *)s, sizeof(s)), HEX);
-  LoRa.endPacket();
-
-  count++;
+    //Append the CRC16 Checksum to the end of the message
+    LoRa.print("*");
+    LoRa.print(calcCRC16((uint8_t *)s, sizeof(s)), HEX);
+    LoRa.endPacket();
+    count++;
+  }
+  else {
+    digitalWrite(LED_BUILTIN, HIGH);
+    LoRa.beginPacket();
+    LoRa.print("$$");
+    LoRa.print(FlightName);
+    LoRa.print("NO GPS FIX");
+    LoRa.endPacket();
+  }
+  pkt_count++;
 }
 
 void formatTime(int h, int m, int s) {

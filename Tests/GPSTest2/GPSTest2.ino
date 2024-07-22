@@ -28,6 +28,7 @@ char altitude[10];
 void setup() {
   //Setup to work with HAB Gateway etc
   Serial.begin(57600);
+  delay(3000);
   Serial.println("");
   Serial.print(DEVICE);
   Serial.print("");

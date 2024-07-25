@@ -94,7 +94,8 @@ void sendInfo() {
     LoRa.beginPacket();
     LoRa.print("$$");
     LoRa.print(FlightName);
-    LoRa.print("NO GPS FIX");
+    LoRa.print(" NO GPS FIX - TIME: ");
+    LoRa.print(hms);
     LoRa.endPacket();
   }
   pkt_count++;

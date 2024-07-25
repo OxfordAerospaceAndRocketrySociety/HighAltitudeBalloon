@@ -16,6 +16,9 @@ void SetupGPSCommand()
 void setup(){
   Serial.begin(9600);
   ss.begin(9600);
+  
+  //Setup the builtin LED
+  pinMode(LED_BUILTIN, OUTPUT);
 
   delay(3000);
   //Serial.println("Sending GPS setup command");

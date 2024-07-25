@@ -1,4 +1,4 @@
-22215749301906805
+22219193162662948
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -81619,6 +81619,20 @@ Skyworks
 0
 7
 7
+RFM9X
+Antenna
+
+
+0
+3
+3
+RFM9X
+RFM9X
+
+
+0
+16
+16
 RFM9X-Breakout
 RFM9X
 

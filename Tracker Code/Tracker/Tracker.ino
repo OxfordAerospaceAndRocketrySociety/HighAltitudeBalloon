@@ -25,10 +25,10 @@ int count = 0;
 int pkt_count = 0;
 
 //Setup the clock
-char hms[18];
+String hms;
 
 //Setup the altitude
-char altitude[10];
+String altitude;
 
 void setup() {
   //Setup the serial connection
@@ -70,29 +70,32 @@ void loop() {
 
 void sendInfo() {
   //Create a UKHAS Standard message (using: https://www.daveakerman.com/?p=2987)
-  char s[100];
+  String message;
   formatTime(gps.time.hour(), gps.time.minute(), gps.time.second());
   formatAltitude(gps.altitude.meters());
 
-  snprintf(s, sizeof(s), "$$%s,%i,%s,%f,%f,%s", FlightName.c_str(), count, hms, gps.location.lat(), gps.location.lng(), altitude);
+  message = FlightName+","+String(count)+","+hms+","+String(gps.location.lat(),6)+","+String(gps.location.lng(),6)+","+String(altitude);
+
   Serial.print("Sending packet: ");
   Serial.println(pkt_count);
 
   if (gps.location.lat() != 0.0) {
     digitalWrite(LED_BUILTIN, LOW);
     LoRa.beginPacket();
-    LoRa.print(s);
+    LoRa.print("$$");
+    LoRa.print(message);
 
     //Append the CRC16 Checksum to the end of the message
     LoRa.print("*");
-    LoRa.print(calcCRC16((uint8_t *)s, sizeof(s)), HEX);
+    //CRC16 Configuration - Polynome: 0x1021, Initial Value: 0xFFFF, Final Value: 0x0000
+    LoRa.print(calcCRC16((uint8_t *)message.c_str(),message.length(),4129,65535,0), HEX);
     LoRa.endPacket();
     count++;
   }
   else {
     digitalWrite(LED_BUILTIN, HIGH);
     LoRa.beginPacket();
-    LoRa.print("$$");
+    LoRa.print("??");
     LoRa.print(FlightName);
     LoRa.print(" NO GPS FIX - TIME: ");
     LoRa.print(hms);
@@ -103,38 +106,37 @@ void sendInfo() {
 
 void formatTime(int h, int m, int s) {
   //Setup Arrays for Storing Time Strings
-  char H[4];
-  char M[4];
-  char S[4];
+  String H;
+  String M;
+  String S;
 
   //Add leading zero
   if (h < 10) {
-    snprintf(H, sizeof(H), "0%i", h);
+    H = "0" + String(h);
   } else {
-    snprintf(H, sizeof(H), "%i", h);
+    H = String(h);
   }
   if (m < 10) {
-    snprintf(M, sizeof(M), "0%i", m);
+    M = "0" + String(m);
   } else {
-    snprintf(M, sizeof(M), "%i", m);
+    M = String(m);
   }
   if (s < 10) {
-    snprintf(S, sizeof(S), "0%i", s);
+    S = "0" + String(s);
   } else {
-    snprintf(S, sizeof(S), "%i", s);
+    S = String(s);
   }
 
   //Format the time
-  snprintf(hms, sizeof(hms), "%s:%s:%s", H, M, S);
+  hms = H+":"+M+":"+S;
 }
 
 void formatAltitude(float alt) {
   int length = String(int(round(alt))).length();
   if (length > 5) {
     //Set maxiumum altitude
-    snprintf(altitude, sizeof(altitude), "99999");
+    altitude = "99999";
   } else {
-    //Add leading zeros
-    snprintf(altitude, sizeof(altitude), "%05d", int(round(alt)));
+    altitude = String(int(round(alt)));
   }
 }

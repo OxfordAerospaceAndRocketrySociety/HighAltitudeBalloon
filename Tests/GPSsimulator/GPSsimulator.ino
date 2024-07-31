@@ -25,6 +25,9 @@ String altitude = "00123";
 float lat = 51.75872785;
 float lng = -1.26279873;
 
+//Setup RSSI
+int RSSI = 50;
+
 void setup() {
   //Setup to work with HAB Gateway etc
   Serial.begin(57600);
@@ -42,16 +45,21 @@ void loop() {
 
 void displayInfo() {
   //Create a UKHAS Standard message (using: https://www.daveakerman.com/?p=2987)
-  char s[100];
+  String message;
   float latRnd = float(random(-250,250))/1000+lat;
   float lngRnd = float(random(-250,250))/1000+lng;
-  snprintf(s, sizeof(s), "$$%s,%i,%s,%f,%f,%s", FlightName.c_str(), count, hms.c_str(), latRnd, lngRnd, altitude.c_str());
-  Serial.print("Message=");
-  Serial.print(s);
+  int RSSIRnd = RSSI + random(-20,20);
+  message = FlightName+","+String(count)+","+hms+","+String(latRnd,6)+","+String(lngRnd,6)+","+String(altitude);
+  Serial.print("Message=$$");
+  Serial.print(message);
 
   //Append the CRC16 Checksum to the end of the message
   Serial.print("*");
-  Serial.println(calcCRC16((uint8_t *)s, sizeof(s)), HEX);
+  //CRC16 Configuration - Polynome: 0x1021, Initial Value: 0xFFFF, Final Value: 0x0000
+  Serial.println(calcCRC16((uint8_t *)message.c_str(),message.length(),4129,65535,0), HEX);
+
+  Serial.print("RSSI:");
+  Serial.println(RSSIRnd);
 
   count++;
 }

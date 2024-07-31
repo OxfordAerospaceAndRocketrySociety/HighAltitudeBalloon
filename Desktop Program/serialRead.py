@@ -1,6 +1,7 @@
 #Oxford Aerospace and Rocketry Society 2024
 import serial.tools.list_ports
 import tkinter as tk
+from crc import Calculator, Configuration
 
 def getDev():
     #Find the ports and filter out the unused ones, terminal input
@@ -54,19 +55,60 @@ def selectPort():
     window.destroy()
 
 def decodeUKHASmessage(msg):
+    #Configure the CRC checksum calculator
+    config = Configuration(
+        width=16,
+        polynomial=0x1021,
+        init_value=0xFFFF,
+        final_xor_value=0x0000,
+        reverse_input=False,
+        reverse_output=False,
+    )
+    calculator = Calculator(config) 
+    #Get rid of any extra useless parts of serial input
+    msg = msg[2:-5]
     #'$$FLIGHTNAME,COUNT,TIME,LAT,LONG,ALTITUDE'
-    parts = msg.split(",")
-    name = parts[0][12:]
-    [count,time,lat,long] = parts[1:5]
-    alt = parts[5][0:5]
-    return([name,count,time,lat,long,alt])
+    if msg[0:10] == "Message=$$" and "*" in msg:
+        #Split out CRC and message
+        [raw,crc] = msg.split("*")
+        #Data which the checksum is calculated over
+        data = raw[10:]
+        #Recieved CRC
+        crcInt = int(crc, 16)
+        #Calculate CRC from data
+        calcCrc = calculator.checksum(str.encode(data))
+        #0 CRC matches
+        if calcCrc == crcInt:
+            parts = msg.split(",")
+            name = parts[0][10:]
+            [count,time,lat,long] = parts[1:5]
+            alt = parts[5].split("*")[0]
+            return([0,name,count,time,lat,long,alt,crc])
+        #2 CRC doesn't match
+        else:
+            return([2,msg])
+    #1 Recieved RSSI
+    elif msg[0:4] == "RSSI":
+        RSSI = msg[5:]
+        return([1,RSSI])
+    #3 Other error
+    else:
+        return([3,msg])
 
 if __name__ == "__main__":
     ser = openPortTerm()
     while True:
         try:
-            [name,count,time,lat,long,alt]=decodeUKHASmessage(str(ser.readline()))
-            print("Flight Name - %s\nMessage Count  - %s\nTime - %s\nLatitude  - %s\nLongitude - %s\nAltitude - %s\n"%(name,count,time,lat,long,alt))
+            msg = str(ser.readline())
+            decodedMsg=decodeUKHASmessage(msg)
+            #Print data from message
+            if decodedMsg[0] == 0:
+                [name,count,time,lat,long,alt,crc] = decodedMsg[1:]
+                print("Flight Name - %s\nMessage Count  - %s\nTime - %s\nLatitude  - %s\nLongitude - %s\nAltitude - %s\nCRC - %s"%(name,count,time,lat,long,alt,crc))
+            #Print RSSI
+            elif decodedMsg[0] == 1:
+                RSSI = decodedMsg[1]
+                print("RSSI - %s\n"%RSSI)
         except KeyboardInterrupt:
             ser.close()
     

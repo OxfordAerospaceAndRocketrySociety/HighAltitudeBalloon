@@ -9,6 +9,6 @@
 7. Install ```CRC by Rob Tillaart``` in the library manager.
 8. You're done!
 ## Python Dependencies
-Please use pip to install `pyserial` and `tkintermapview`.
+Please use pip to install `pyserial`, `crc`, `sondehub`and `tkintermapview`.
 ## KiCad Libraries
 Pi Pico - https://github.com/ncarandini/KiCad-RP-Pico

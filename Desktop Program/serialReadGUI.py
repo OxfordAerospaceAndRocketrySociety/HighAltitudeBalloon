@@ -71,7 +71,9 @@ if __name__ == "__main__":
     #Start uploader (CHANGE NAME)
     logging.basicConfig(format="%(asctime)s %(levelname)s:%(message)s", level=logging.INFO) #Logging output for uploader
     uploader = Uploader(
-    "OXHABTRACK0",
+    #"MYCALL" for testing
+    "OXHABTRACK1",
+    #False for upload
     developer_mode=True)
     update()
     window.mainloop()

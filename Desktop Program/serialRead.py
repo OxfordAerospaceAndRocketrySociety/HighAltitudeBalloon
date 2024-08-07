@@ -74,7 +74,11 @@ def decodeUKHASmessage(msg):
         #Data which the checksum is calculated over
         data = raw[10:]
         #Recieved CRC
-        crcInt = int(crc, 16)
+        try:
+            crcInt = int(crc, 16)
+        #4 CRC Doesn't Match (CRC Corrupted)
+        except ValueError:
+            return([4,msg])
         #Calculate CRC from data
         calcCrc = calculator.checksum(str.encode(data))
         #0 CRC matches

@@ -18,7 +18,7 @@ CRC16 crc;
 UART GPSserial(4, 5, NC, NC);
 
 //LoRa Transmission freqeuncy (hz) 
-int freq = 433E6; 
+int freq = 434.145E6; 
 
 //Setup message counters
 int count = 0;

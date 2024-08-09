@@ -72,7 +72,7 @@ if __name__ == "__main__":
     logging.basicConfig(format="%(asctime)s %(levelname)s:%(message)s", level=logging.INFO) #Logging output for uploader
     uploader = Uploader(
     #"MYCALL" for testing
-    "OXHABTRACK1",
+    "MYCALL",
     #False for upload
     developer_mode=True)
     update()

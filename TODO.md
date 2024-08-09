@@ -1,6 +1,6 @@
 # Avionics TODO List
 ## Tracker
-* Add velocity to message.
+* Add velocity to message?
 ## Desktop Program
 ## Logger
 * Write code for taking pictures on the pi zeros.

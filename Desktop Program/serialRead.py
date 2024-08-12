@@ -22,7 +22,7 @@ def openPortTerm():
     for i in range(len(devices)):
         print("%i - %s"%(i,devices[i]))
     portNo = int(input("Please enter the port number: "))
-    ser = serial.Serial(devices[portNo])
+    ser = serial.Serial(devices[portNo],timeout = 3)
     return ser
 
 def openPortGUI():
@@ -51,7 +51,7 @@ def openPortGUI():
 def selectPort():
     #Command for retrieving selection and destroying window
     global ser
-    ser = serial.Serial(device.get())
+    ser = serial.Serial(device.get(),timeout=3)
     window.destroy()
 
 def decodeUKHASmessage(msg):
@@ -70,27 +70,31 @@ def decodeUKHASmessage(msg):
     #'$$FLIGHTNAME,COUNT,TIME,LAT,LONG,ALTITUDE'
     if msg[0:10] == "Message=$$" and "*" in msg:
         #Split out CRC and message
-        [raw,crc] = msg.split("*")
-        #Data which the checksum is calculated over
-        data = raw[10:]
-        #Recieved CRC
-        try:
-            crcInt = int(crc, 16)
-        #4 CRC Doesn't Match (CRC Corrupted)
-        except ValueError:
-            return([4,msg])
-        #Calculate CRC from data
-        calcCrc = calculator.checksum(str.encode(data))
-        #0 CRC matches
-        if calcCrc == crcInt:
-            parts = msg.split(",")
-            name = parts[0][10:]
-            [count,time,lat,long] = parts[1:5]
-            alt = parts[5].split("*")[0]
-            return([0,name,count,time,lat,long,alt,crc])
-        #2 CRC doesn't match
+        if len(msg.split("*")) == 2:
+            [raw,crc] = msg.split("*")
+            #Data which the checksum is calculated over
+            data = raw[10:]
+            #Recieved CRC
+            try:
+                crcInt = int(crc, 16)
+            #4 CRC Doesn't Match (CRC Corrupted)
+            except ValueError:
+                return([4,msg])
+            #Calculate CRC from data
+            calcCrc = calculator.checksum(str.encode(data))
+            #0 CRC matches
+            if calcCrc == crcInt:
+                parts = msg.split(",")
+                name = parts[0][10:]
+                [count,time,lat,long] = parts[1:5]
+                alt = parts[5].split("*")[0]
+                return([0,name,count,time,lat,long,alt,crc])
+            #2 CRC doesn't match
+            else:
+                return([2,msg])
+        #5 Recieved wrong no of *'s 
         else:
-            return([2,msg])
+            return([5,msg])
     #1 Recieved RSSI
     elif msg[0:4] == "RSSI":
         RSSI = msg[5:]

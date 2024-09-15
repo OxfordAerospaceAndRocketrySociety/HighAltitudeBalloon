@@ -13,6 +13,7 @@ def update():
         for i in range(len(values)):
             labels[i]['text'] = "%s%s" % (fieldNames[i],values[i])
         marker.set_position(float(values[3]),float(values[4]))
+        map_widget.set_position(float(values[3]),float(values[4]))
         #If upload to sondehub checked
         if uploadData.get() == True:
             uploader.add_telemetry(
